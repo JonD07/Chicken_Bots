@@ -1,13 +1,18 @@
 /*
-
+ * Created by: Jonathan Diller
+ * On: 04/24/2020
+ * 
+ * Chicken-Bots; Resource allocation swarms with
+ * 	motion planning grammar
+ * 
  */
 
 //
 /// Global constants
-const int SENSOR_TEST = 1;
-const int SPEED = 75;
+const int SENSOR_TEST = 0;
+const int SPEED = 65;
 const int LED = 4;
-const int LIGHT_BUFFER = 40;
+const int LIGHT_BUFFER = 10;
 
 // Distance sensors
 const int echoPin1 = 2;		// Right sensor
@@ -133,19 +138,40 @@ void loop() {
 		Serial.print("\tDist L: ");
 		Serial.print(distance2);
 	
-		Serial.print("\tPht LHF: ");
+		Serial.print("\tPht [0]: ");
 		Serial.print(lightLevels[0]);
-		Serial.print("\tPht LHA: ");
-		Serial.print(lightLevels[2]);
-		Serial.print("\tPht RHF: ");
+		Serial.print("\tPht [1]: ");
 		Serial.print(lightLevels[1]);
-		Serial.print("\tPht RHA: ");
+		Serial.print("\tPht [2]: ");
+		Serial.print(lightLevels[2]);
+		Serial.print("\tPht [3]: ");
 		Serial.print(lightLevels[3]);
 		
 		Serial.print("\tL: ");
 		Serial.print(left_sensor);
 		Serial.print("\tR: ");
-		Serial.println(right_sensor);
+		Serial.print(right_sensor);
+		
+		// Test logic to find 2 largest light levels
+		int top1 = 0, top2;
+		for(int i = 1; i < 4; i++) {
+			if(lightLevels[i] > lightLevels[top1]) {
+				top1 = i;
+			}
+		}
+		
+		top1 == 0 ? top2 = 1: top2 = 0;
+		
+		for(int i = 1; i < 4; i++) {
+			if((lightLevels[i] > lightLevels[top2]) && (i != top1)) {
+				top2 = i;
+			}
+		}
+		
+		Serial.print("\tT1: ");
+		Serial.print(top1);
+		Serial.print("\tT2: ");
+		Serial.println(top2);
 		
 		if(left_sensor || right_sensor) {
 			digitalWrite(LED, HIGH);
@@ -248,18 +274,44 @@ int runStateMachine() {
 				return H;
 			}
 			
+			int top1 = 0, top2;
 			lightLevels[0] = analogRead(photoLHFwd);	// LH Forward
 			lightLevels[1] = analogRead(photoRHFwd);	// RH Forward
 			lightLevels[2] = analogRead(photoLHAft);	// LH Aft
 			lightLevels[3] = analogRead(photoRHAft);	// RH Aft
 			
-			// TODO: find 2 largest light levels
+			// Find 2 largest light levels
+			for(int i = 1; i < 4; i++) {
+				if(lightLevels[i] > lightLevels[top1]) {
+					top1 = i;
+				}
+			}
 			
+			top1 == 0 ? top2 = 1: top2 = 0;
 			
-			// TODO: make transitions for light levels
+			for(int i = 1; i < 4; i++) {
+				if((lightLevels[i] > lightLevels[top2]) && (i != top1)) {
+					top2 = i;
+				}
+			}
+			
+			// transitions for light levels
+			if((top1 == 0) && (top2 == 2)) {
+				left();
+				return D;
+			}
+			if((top1 == 0) && (top2 == 1)) {
+				forward();
+				return D;
+			}
+			if(((top1 == 1) && (top2 == 3)) ||
+					((top1 == 2) && (top2 == 3))) {
+				right();
+				return D;
+			}
 			
 			// epsolon transition
-			left();
+			forward();
 			return D;
 		}
 		
