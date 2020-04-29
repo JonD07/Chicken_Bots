@@ -255,6 +255,7 @@ int runStateMachine() {
 			
 			// TODO: find 2 largest light levels
 			
+			
 			// TODO: make transitions for light levels
 			
 			// epsolon transition
