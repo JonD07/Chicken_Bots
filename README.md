@@ -14,6 +14,6 @@
 
 ### 4. Select board type (Tools -> Board -> "Arduino Uno")
 
-### 5. Select port (Tools -> port -> <select Uno port>)
+### 5. Select port (Tools -> port)
 
 ### 6. Click "Upload"
