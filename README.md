@@ -11,4 +11,4 @@
 ### 3. Import Final_Proj.ino into Arduino IDE
 ### 4. Select board type (Tools -> Board -> "Arduino Uno")
 ### 5. Select port (Tools -> port -> <select Uno port>)
-### 1. Click "Upload"
+### 6. Click "Upload"
